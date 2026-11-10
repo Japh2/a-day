@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A Letter For You</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@1,600&family=Poppins:wght@300;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            background: radial-gradient(circle at center, #1a0b2e 0%, #0a0514 100%);
+            color: white;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Poppins', sans-serif;
+            overflow: hidden;
+            perspective: 1500px; /* Creates the 3D depth */
+        }
+
+        .envelope-wrapper {
+            position: relative;
+            width: 320px;
+            height: 220px;
+            cursor: pointer;
+            transition: transform 0.5s ease;
+        }
+
+        .envelope-wrapper:hover {
+            transform: scale(1.05);
+        }
+
+        /* The Envelope Base */
+        .envelope {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: #2d0a36;
+            border-radius: 10px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5), 0 0 30px rgba(147, 51, 234, 0.3);
+            overflow: hidden;
+        }
+
+        /* The Letter Inside */
+        .letter {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            right: 10px;
+            bottom: 10px;
+            background: #f8f9fa;
+            border-radius: 5px;
+            padding: 30px;
+            color: #333;
+            text-align: center;
+            transition: transform 1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 2;
+            /* Hide text initially */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .letter h2 {
+            font-family: 'Playfair Display', serif;
+            color: #9333ea;
+            margin-bottom: 15px;
+            font-size: 1.8rem;
+        }
+
+        .letter p {
+            font-size: 1rem;
+            line-height: 1.6;
+            color: #555;
+        }
+
+        /* The Envelope Flaps */
+        .flap {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #3d0c4b;
+            z-index: 3;
+            transition: transform 0.8s ease-in-out;
+            transform-origin: top;
+            clip-path: polygon(0 0, 50% 50%, 100% 0);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .front-pocket {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #2d0a36;
+            z-index: 4;
+            clip-path: polygon(0 100%, 0 20%, 50% 60%, 100% 20%, 100% 100%);
+            border-radius: 10px;
+            pointer-events: none;
+        }
+
+        /* The Wax Seal */
+        .seal {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #e879f9, #9333ea);
+            border-radius: 50%;
+            z-index: 5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            color: white;
+            box-shadow: 0 0 20px rgba(232, 121, 249, 0.6);
+            transition: all 0.5s ease;
+            pointer-events: none;
+        }
+
+        /* --- ANIMATION STATES --- */
+
+        /* When opened, flip the top flap */
+        .envelope-wrapper.open .flap {
+            transform: rotateX(180deg);
+            z-index: 1; /* Move behind the letter */
+        }
+
+        /* When opened, slide the letter up and out */
+        .envelope-wrapper.open .letter {
+            transform: translateY(-80px);
+            z-index: 5; /* Bring above the front pocket */
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            height: auto;
+            min-height: 250px;
+            bottom: auto;
+        }
+
+        /* When opened, fade out the wax seal */
+        .envelope-wrapper.open .seal {
+            opacity: 0;
+            transform: translate(-50%, -50%) scale(1.5);
+        }
+
+        /* Instruction text */
+        .instruction {
+            position: absolute;
+            bottom: -50px;
+            width: 100%;
+            text-align: center;
+            color: #c084fc;
+            font-size: 1rem;
+            letter-spacing: 2px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="envelope-wrapper" id="envelope" onclick="openEnvelope()">
+        
+        <!-- The Letter Inside -->
+        <div class="letter">
+            <h2>For You 💜</h2>
+            <p>
+                I wanted to do something different.<br><br>
+                You are the most <strong>beautiful and humble soul</strong> I have ever met.<br><br>
+                Just wanted to make you smile today.
+            </p>
+        </div>
+
+        <!-- The Envelope Structure -->
+        <div class="envelope">
+            <div class="flap"></div>
+            <div class="front-pocket"></div>
+        </div>
+
+        <!-- The Wax Seal -->
+        <div class="seal">💜</div>
+
+        <div class="instruction">Tap to open</div>
+    </div>
+
+    <script>
+        let isOpen = false;
+
+        function openEnvelope() {
+            if (isOpen) return;
+            
+            const envelope = document.getElementById('envelope');
+            
+            // Add the open class to trigger CSS animations
+            envelope.classList.add('open');
+            
+            // Remove the instruction text
+            document.querySelector('.instruction').style.display = 'none';
+            
+            isOpen = true;
+        }
+    </script>
+
+</body>
+</html>
